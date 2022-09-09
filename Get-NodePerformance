@@ -19,7 +19,7 @@ Param(
 
      if ($UserName -match $re) {
 
-        $DomainUserName = "chop.edu\" + $UserName
+        $DomainUserName = "Contoso\" + $UserName
 
         $creds = Get-Credential -Credential $DomainUserName
 
