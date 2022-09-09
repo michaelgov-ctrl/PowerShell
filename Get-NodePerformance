@@ -1,0 +1,131 @@
+<#
+
+This function returns the general performance of the target node(s)
+
+-Michael Governanti 9/7/2022
+
+#>
+
+function Get-NodePerformance {
+
+Param(
+        [Parameter(Mandatory)]
+        [string[]]$ComputerName=@(),
+        [Parameter(Mandatory)]
+        [string]$UserName
+     )
+
+     $re = "^.*$"    ###regex to match administrative account(emptied to work with anystring)
+
+     if ($UserName -match $re) {
+
+        $DomainUserName = "chop.edu\" + $UserName
+
+        $creds = Get-Credential -Credential $DomainUserName
+
+        $ComputerInfo = foreach($Computer in $ComputerName) {
+
+            if (Test-Connection $Computer -Count 2 -Quiet) {
+
+                if (Test-WSMan $Computer -ErrorAction SilentlyContinue) {
+
+                    $ipv4 = '^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'    ###IPV4 regex
+
+                        if ($Computer -match $ipv4) {
+            
+                           $HostName = [System.Net.Dns]::GetHostByAddress($Computer).Hostname
+
+                        } else {
+
+                           $HostName = $Computer
+
+                        }
+
+                    $CIMSession = New-CimSession -ComputerName $HostName -Credential $creds -Authentication Negotiate
+        
+                    if ($CIMSession -ne $null) {
+
+                        try {
+
+                            $ProcessorInfo = Get-CimInstance -CimSession $CIMSession -ClassName Win32_Processor | Measure-Object -Property LoadPercentage -Average
+
+                            $OSInfo = Get-CimInstance -CimSession $CIMSession -ClassName Win32_OperatingSystem
+
+                            $Drives = Get-CimInstance -CimSession $CIMSession -ClassName Win32_LogicalDisk | Where-Object {$_.DriveType -eq 3}
+
+                            $DriveInfo = foreach($Drive in $Drives) {
+
+                                            [pscustomobject]@{
+                                            DriveName = $Drive.DeviceID
+                                            Size = [math]::Round(($Drive.Size / 1gb),2)
+                                            FreeSpace = [math]::Round(($Drive.FreeSpace / 1gb),2)
+                                            PercentFree = ($Drive.FreeSpace / $Drive.Size).ToString("P")
+                                            }
+
+                                        }
+
+                                [pscustomobject]@{
+                                    Computer = $Computer
+                                    IsUp = $true
+                                    WSManRunning = $true
+                                    ProcessorUsage = [string]$ProcessorInfo.Average + "%"
+                                    RamUsage = (($OSInfo.TotalVisibleMemorySize - $OSInfo.FreePhysicalMemory)/$OSInfo.TotalVisibleMemorySize).ToString("P")
+                                    DriveInfo = $DriveInfo
+                                 }
+                
+                        } catch {
+
+                        }
+
+                        $CIMSession | Remove-CimSession
+
+                    } else {
+
+                        [pscustomobject]@{
+	                        Computer = $Computer
+                            IsUp = $true
+                            WSManRunning = $true
+	                        ProcessorUsage = ''
+	                        RamUsage = ''
+	                        DriveInfo = ''
+                        }
+
+                    }
+
+                } else {
+
+                    [pscustomobject]@{
+	                    Computer = $Computer
+                        IsUp = $true
+                        WSManRunning = $false
+	                    ProcessorUsage = ''
+	                    RamUsage = ''
+	                    DriveInfo = ''
+                    }
+
+                }
+
+            } else {
+
+                [pscustomobject]@{
+	                Computer = $Computer
+                    IsUp = $false
+                    WSManRunning = ''
+	                ProcessorUsage = ''
+	                RamUsage = ''
+	                DriveInfo = ''
+                }
+
+            }
+
+        }
+
+        return $ComputerInfo
+
+    } else {
+
+        Throw "Please use an elevated account for administrative access"
+
+    }
+
+}
