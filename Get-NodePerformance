@@ -15,7 +15,7 @@ Param(
         [string]$UserName
      )
 
-     $re = "^.*$"    ###regex to match administrative account(emptied to work with anystring)
+     $re = "^.*$"    ###regex to match appropriate account syntax(emptied to work with anystring)
 
      if ($UserName -match $re) {
 
@@ -124,7 +124,7 @@ Param(
 
     } else {
 
-        Throw "Please use an elevated account for administrative access"
+        Throw "Please use a valid Contoso account"
 
     }
 
