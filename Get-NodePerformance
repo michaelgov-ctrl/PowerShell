@@ -56,10 +56,10 @@ Param(
                             $DriveInfo = foreach($Drive in $Drives) {
 
                                             [pscustomobject]@{
-                                            DriveName = $Drive.DeviceID
-                                            Size = [math]::Round(($Drive.Size / 1gb),2)
-                                            FreeSpace = [math]::Round(($Drive.FreeSpace / 1gb),2)
-                                            PercentFree = ($Drive.FreeSpace / $Drive.Size).ToString("P")
+                                            	DriveName = $Drive.DeviceID
+                                            	Size = [math]::Round(($Drive.Size / 1gb),2)
+                                            	FreeSpace = [math]::Round(($Drive.FreeSpace / 1gb),2)
+                                            	PercentFree = ($Drive.FreeSpace / $Drive.Size).ToString("P")
                                             }
 
                                         }
@@ -82,12 +82,12 @@ Param(
                     } else {
 
                         [pscustomobject]@{
-	                        Computer = $Computer
+	                    Computer = $Computer
                             IsUp = $true
                             WSManRunning = $true
-	                        ProcessorUsage = ''
-	                        RamUsage = ''
-	                        DriveInfo = ''
+	                    ProcessorUsage = ''
+	                    RamUsage = ''
+	                    DriveInfo = ''
                         }
 
                     }
@@ -95,12 +95,12 @@ Param(
                 } else {
 
                     [pscustomobject]@{
-	                    Computer = $Computer
+	                Computer = $Computer
                         IsUp = $true
                         WSManRunning = $false
-	                    ProcessorUsage = ''
-	                    RamUsage = ''
-	                    DriveInfo = ''
+	                ProcessorUsage = ''
+	                RamUsage = ''
+	                DriveInfo = ''
                     }
 
                 }
@@ -108,12 +108,12 @@ Param(
             } else {
 
                 [pscustomobject]@{
-	                Computer = $Computer
+	            Computer = $Computer
                     IsUp = $false
                     WSManRunning = ''
-	                ProcessorUsage = ''
-	                RamUsage = ''
-	                DriveInfo = ''
+	            ProcessorUsage = ''
+	            RamUsage = ''
+	            DriveInfo = ''
                 }
 
             }
