@@ -326,9 +326,27 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
                 $DriveSpace = $DriveInfo.FreeSpace
                 $DrivePercent = $DriveInfo.PercentFree
 
+                $HostName = [System.Net.Dns]::GetHostByAddress($TargetIP).Hostname  #$TargetIP comes from line 209
+                $Session = New-PSSession -ComputerName $HostName -Credential $creds #$creds comes from line 316
+
+                $UserDirectories = Invoke-Command -Session $Session -ScriptBlock {Get-ChildItem C:\Users\*}
+
+                    $ProfileObjects = foreach ($UserDirectory in ($UserDirectories | Where-Object {$_.Name -ne "Public"})) {
+    
+                        $Name = $UserDirectory.Name
+        
+                        $LastWriteTime = ($UserDirectory.LastWriteTime -split " ")[0]
+
+                        $DirPath = "C:\Users\" + $UserDirectory.Name
+                        $FileSize = [string][math]::Round((Invoke-Command -Session $SessionVar -ScriptBlock { (Get-ChildItem $using:DirPath -Recurse | Measure-Object -Property length -Sum -ErrorAction SilentlyContinue).Sum/1MB}),2) + " MB"
+
+                            "User: $Name, LastWriteTime: $LastWriteTime, ProfileSize: $FileSize"
+        
+                    } 
+
                 $form = New-Object System.Windows.Forms.Form
                 $form.Text = 'User Profile Remover'
-                $form.Size = New-Object System.Drawing.Size(700,400)
+                $form.Size = New-Object System.Drawing.Size(700,550)
                 $form.StartPosition = 'CenterScreen'
                 $form.FormBorderStyle = 'FixedDialog'
         
@@ -359,9 +377,26 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
                 $labelFour.AutoSize = $true
                 $labelFour.Font = "Microsoft Sans Serif,10"
                 $form.Controls.Add($labelFour)
+
+                $labelFive = New-Object System.Windows.Forms.Label
+                $labelFive.Location = New-Object System.Drawing.Point(35,160)
+                $labelFive.Text = "User Profiles on $TargetIP"
+                $labelFive.AutoSize = $true
+                $labelFive.Font = "Microsoft Sans Serif,12,style=Bold"
+                $form.Controls.Add($labelFive)
+
+                $TextBox1 = New-Object System.Windows.Forms.TextBox 
+                $TextBox1.Multiline = $True;
+                $TextBox1.Location = New-Object System.Drawing.Size(40,200) 
+                $TextBox1.Size = New-Object System.Drawing.Size(600,200)
+                $TextBox1.Scrollbars = "Vertical" 
+                $ProfileObjects | ForEach {
+                    $TextBox1.AppendText($_ + [System.Environment]::Newline)
+                }
+                $form.Controls.Add($TextBox1)
         
                 $NextButton = New-Object System.Windows.Forms.Button
-                $NextButton.Location = New-Object System.Drawing.Point(550,280)
+                $NextButton.Location = New-Object System.Drawing.Point(560,430)
                 $NextButton.Size = New-Object System.Drawing.Size(80,60)
                 $NextButton.Text = 'Check User Profiles'
                 $NextButton.DialogResult = [System.Windows.Forms.DialogResult]::OK
@@ -479,10 +514,7 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
                                                              ######### finally execute function #############
 if ($Seconds -ne $null) {
 
-    $HostName = [System.Net.Dns]::GetHostByAddress($TargetIP).Hostname  #$TargetIP comes from line 209
-    $Session = New-PSSession -ComputerName $HostName -Credential $creds #$creds comes from line 316
-        
-        if ($Session -ne $null) {
+        if ($Session -ne $null) {    ###$Session created at line 328
 
             Remove-UserProfiles -ComputerName $TargetIP -OlderThan $Seconds -SessionVar $Session    #-OlderThan must be provided in Seconds format
         
