@@ -21,7 +21,7 @@ $LogStatsObjects = foreach ($Log in $LogFiles) {
         LogName = $Log.Name
         StartTime = [DateTime]$jobs[0].'Start Time'
         TotalMoveTime = [string]([math]::Round(($Measure.Sum / 60),2)) + " minutes"
-        TotalJobCount = [string]($Measure.Count + 1) 
+        TotalJobCount = [int]$Measure.Count 
         AverageProcessingTime = [string]([math]::Round(($Measure.Average),2)) + " seconds"
     }
 
