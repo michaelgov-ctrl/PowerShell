@@ -1,7 +1,8 @@
 <#
 
 Script to measure stats of multiple exported routing logs in csv format
-Subtracts time of previous job in queue from consequent job in queue to get times between jobs in loop foreach csv in directory where script execution occurs
+extracts 'Time To Run' field foreach job in foreach csv in directory where script execution occurs an object with the following properties:
+LogName,TotalMoveTime,TotalJobCount,AverageProcessingTime
 
 -Mike G
 #>
