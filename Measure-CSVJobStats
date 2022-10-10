@@ -12,9 +12,9 @@ $LogFiles = Get-ChildItem ".\*.csv"
 $LogStatsObjects = foreach ($Log in $LogFiles) {
 
     $jobs = Import-Csv $Log
-    $time = $jobs.'Time To Run    '.Replace(":","")
+    $time = [TimeSpan]$jobs.'Time To Run    '
 
-    $Measure = $time | Measure-Object -Maximum -Average -Sum
+    $Measure = $time | Measure-Object -Property TotalMilliseconds -Average -Sum
 
 
     [pscustomobject]@{ 
@@ -22,7 +22,7 @@ $LogStatsObjects = foreach ($Log in $LogFiles) {
         StartTime = [DateTime]$jobs[0].'Start Time'
         TotalMoveTime = [string]([math]::Round(($Measure.Sum / 1000),3)) + " seconds"
         TotalJobCount = [int]$Measure.Count 
-        AverageProcessingTime = [string]([math]::Round(($Measure.Average),3)) + " seconds"
+        AverageProcessingTime = [string]([math]::Round(($Measure.Average / 1000),3)) + " seconds"
     }
 
 }
