@@ -19,6 +19,7 @@ $LogStatsObjects = foreach ($Log in $LogFiles) {
 
     [pscustomobject]@{ 
         LogName = $Log.Name
+        StartTime = $jobs[0].'Start Time'
         TotalMoveTime = [string]([math]::Round(($Measure.Sum / 60),2)) + " minutes"
         TotalJobCount = [string]($Measure.Count + 1) 
         AverageProcessingTime = [string]([math]::Round(($Measure.Average),2)) + " seconds"
@@ -30,8 +31,8 @@ Write-Output $LogStatsObjects
 
 Output:
 
-LogName  TotalMoveTime TotalJobCount AverageProcessingTime
--------  ------------- ------------- ---------------------
-test.csv 0.18 minutes  60            0.19 seconds   
-1.csv    0.82 minutes  31            1.63 seconds         
-2.csv    22.68 minutes 592           2.3 seconds    
+LogName  StartTime                 TotalMoveTime TotalJobCount AverageProcessingTime
+-------  ---------                 ------------- ------------- ---------------------
+test.csv October 10, 2022 16:01:15 0.18 minutes  60            0.19 seconds   
+1.csv    October 10, 2022 08:10:53 0.82 minutes  31            1.63 seconds         
+2.csv    October 10, 2022 06:42:28 22.68 minutes 592           2.3 seconds    
