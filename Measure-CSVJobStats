@@ -1,5 +1,4 @@
 <#
-
 Script to measure stats of multiple exported routing logs in csv format
 extracts 'Time To Run' field foreach job in foreach csv in directory where script execution occurs an object with the following properties:
 LogName,StartTime,TotalMoveTime,TotalJobCount,AverageProcessingTime
