@@ -30,6 +30,7 @@ $LogStatsObjects = foreach ($Log in $LogFiles) {
 
 Write-Output $LogStatsObjects
 
+<#
 Output:
 
 LogName  StartTime             TotalMoveTime TotalJobCount AverageProcessingTime
@@ -37,3 +38,4 @@ LogName  StartTime             TotalMoveTime TotalJobCount AverageProcessingTime
 test.csv 10/10/2022 4:01:15 PM 0.18 seconds  60            0.003 seconds   
 1.csv    10/10/2022 8:10:53 AM 0.82 seconds  31            0.026 seconds         
 2.csv    10/10/2022 6:42:28 AM 22.68 seconds 592           0.038 seconds    
+#>
