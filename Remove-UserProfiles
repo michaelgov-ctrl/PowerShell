@@ -89,7 +89,7 @@ function Remove-UserProfiles {
         [int]$OlderThan             #-OlderThan must be provided in Seconds format
     )
 
-    $UserDirectories = Invoke-Command -Session $SessionVar -ScriptBlock { Get-ChildItem C:\Users\* }
+    $UserDirectories = Invoke-Command -Session $SessionVar -ScriptBlock { Get-ChildItem C:\Users\* -Exclude "OneDrive"}
     $StaleProfilesSansPublic = $null #initialized to null so second if clause only runs if Stale Profiles other than Public exist
     if ($UserDirectories -ne $null) { 
 
