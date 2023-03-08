@@ -1,8 +1,6 @@
 <#
-This script displays a GUI to provide an interactive experience and then hands the result to the defined Remove-UserProfiles Function
+This function displays a GUI to provide an interactive experience and then hands the result to the defined Remove-UserProfiles Function
 The Remove-UserProfiles Function checks directories at in C:\Users\ of the target computers and checks if the LastWriteTime is greater than the timespan giver to the -OlderThan parameter (-OlderThan parameter must be provided in a second format) 
-
-look into refreshing form if no profiles within age range are found rather than exiting
 
 Written by michaelgov-ctrl 9/23/2022 
 #>
@@ -15,17 +13,7 @@ function Get-NodePerformance {
             [System.Management.Automation.PSCredential]$Credential
          )
     
-            if ($Computer -match $ipv4) {
-                
-                $HostName = [System.Net.Dns]::GetHostByAddress($Computer).Hostname
-    
-            } else {
-    
-                $HostName = $Computer
-    
-            }
-    
-                $CIMSession = New-CimSession -ComputerName $HostName -Credential $Credential -Authentication Negotiate
+                $CIMSession = New-CimSession -ComputerName $Computer -Credential $Credential -Authentication Negotiate
             
             if ($CIMSession -ne $null) {
     
@@ -89,7 +77,7 @@ function Remove-UserProfiles {
         [int]$OlderThan             #-OlderThan must be provided in Seconds format
     )
 
-    $UserDirectories = Invoke-Command -Session $SessionVar -ScriptBlock { Get-ChildItem C:\Users\* -Exclude "OneDrive"}
+    $UserDirectories = Invoke-Command -Session $SessionVar -ScriptBlock { Get-ChildItem C:\Users\* }
     $StaleProfilesSansPublic = $null #initialized to null so second if clause only runs if Stale Profiles other than Public exist
     if ($UserDirectories -ne $null) { 
 
@@ -326,8 +314,9 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
                 $DriveSpace = $DriveInfo.FreeSpace
                 $DrivePercent = $DriveInfo.PercentFree
 
-                $HostName = [System.Net.Dns]::GetHostByAddress($TargetIP).Hostname  #$TargetIP comes from line 209
-                $Session = New-PSSession -ComputerName $HostName -Credential $creds #$creds comes from line 316
+                #$HostName = [System.Net.Dns]::GetHostByAddress($TargetIP).Hostname  #$TargetIP comes from line 209
+                #$Session = New-PSSession -ComputerName $HostName -Credential $creds #$creds comes from line 316
+                $Session = New-PSSession -ComputerName $TargetIP -Credential $creds #$creds comes from line 316
 
                 $UserDirectories = Invoke-Command -Session $Session -ScriptBlock {Get-ChildItem C:\Users\*}
 
@@ -338,7 +327,7 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
                         $LastWriteTime = ($UserDirectory.LastWriteTime -split " ")[0]
 
                         $DirPath = "C:\Users\" + $UserDirectory.Name
-                        $FileSize = [string][math]::Round((Invoke-Command -Session $Session -ScriptBlock { (Get-ChildItem $using:DirPath -Recurse | Measure-Object -Property length -Sum -ErrorAction SilentlyContinue).Sum/1MB}),2) + " MB"
+                        $FileSize = [string][math]::Round((Invoke-Command -Session $Session -ScriptBlock { (Get-ChildItem $using:DirPath -Exclude "OneDrive" -Recurse | Measure-Object -Property length -Sum -ErrorAction SilentlyContinue).Sum/1MB}),2) + " MB"
 
                             "User: $Name, LastWriteTime: $LastWriteTime, ProfileSize: $FileSize"
         
@@ -513,7 +502,7 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
        
                                                              ######### finally execute function #############
 if ($Seconds -ne $null) {
-
+        
         if ($Session -ne $null) {    ###$Session created at line 328
 
             Remove-UserProfiles -ComputerName $TargetIP -OlderThan $Seconds -SessionVar $Session    #-OlderThan must be provided in Seconds format
