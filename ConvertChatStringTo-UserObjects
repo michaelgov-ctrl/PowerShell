@@ -28,5 +28,5 @@ $ArrayOfEntityObjects = while ((3 * $SliceCounter) -lt $toArray.Count){
 
     $SliceCounter ++
 
-    } 
+} 
 
