@@ -135,6 +135,10 @@ function Get-HostInfo {
 
                             try {
 
+                                $NetworkInfo = Get-CimInstance -CimSession $CIMSession -Class Win32_NetworkAdapterConfiguration -Filter IPEnabled=$true
+
+                                $ComputerSystem = Get-CimInstance -CimSession $CIMSession -Class Win32_ComputerSystem
+
                                 $ProcessorInfo = Get-CimInstance -CimSession $CIMSession -ClassName Win32_Processor
 
                                 $OSInfo = Get-CimInstance -CimSession $CIMSession -ClassName Win32_OperatingSystem
@@ -154,20 +158,13 @@ function Get-HostInfo {
 
                                             }
 
-                                $InvokeScriptBlock = {
+                                <#
+                                            ### REPRESENTATIVE OBJECT TO BE RETURNED ###
+                                #>
 
                                     [pscustomobject]@{
-                                        IP = (Get-NetIPAddress | Where-Object { $_.IPAddress -match "10.*.*.*" }).IPAddress
-                                        HostName = $env:COMPUTERNAME
-                                    }
-
-                                }
-
-                                $InvokeObject = Invoke-Command -ComputerName $HostName -Credential $Creds -ScriptBlock $InvokeScriptBlock -HideComputerName
-
-                                    [pscustomobject]@{
-                                        IP = $InvokeObject.IP
-                                        HostName = $InvokeObject.HostName
+                                        IP = ($NetworkInfo).IPAddress
+                                        HostName = ($ComputerSystem).Name
                                         ProcessorName = $ProcessorInfo[0].Name
                                         ProcCoreCount = ($ProcessorInfo.NumberOfCores | Measure-Object -sum).sum
                                         ProcessorUsage = [string]([math]::Round((($ProcessorInfo | Measure-Object -Property LoadPercentage -Average).Average),2)) + "%"
@@ -176,7 +173,11 @@ function Get-HostInfo {
                                         DriveInfo = $DriveInfo
                                         LastBootTime = $OSInfo.LastBootUpTime
                                      }
-                
+                                
+                                <#
+                                           ### REPRESENTATIVE OBJECT TO BE RETURNED ###
+                                #>
+
                             } catch {
 
                             }
@@ -196,7 +197,7 @@ function Get-HostInfo {
                     } else {
 
                         [pscustomobject]@{
-	                        Node = $Computer
+	                    Node = $Computer
                             IsUp = $true
                             WSManRunning = $false
                         }
@@ -206,7 +207,7 @@ function Get-HostInfo {
                 } else {
 
                     [pscustomobject]@{
-	                    Node = $Computer
+	                Node = $Computer
                         IsUp = $false
                         WSManRunning = $false
                     }
