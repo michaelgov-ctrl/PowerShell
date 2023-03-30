@@ -36,7 +36,13 @@ function Search-PacsCorrectionForms {
 
             }
 
-	}
+	} else {
+
+            #default is to return last 30 days to prevent long process time
+            $ReturnBeginDate = (Get-Date).AddDays(-30)
+            $DateBegin = [string]($ReturnBeginDate.Year) + "-" + [string]($ReturnBeginDate.Month) + "-" + [string]($ReturnBeginDate.Day) + " 00:00"
+    
+        }
 
         <#
             End processing of date parameter
