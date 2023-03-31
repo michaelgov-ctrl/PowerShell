@@ -4,18 +4,20 @@ function Search-PacsCorrectionForms {
     Param(
         [Parameter(Position = 0,Mandatory = $false)]
         [int]$BeginDate,
-        [Parameter(Mandatory = $false)]
+        [Parameter(Mandatory = $false)]  
         [array[]]$NameMatch,
         [Parameter(Mandatory = $false)]  
         [array[]]$AccMatch,
         [Parameter(Mandatory = $false)]  
         [array[]]$MrnMatch,
         [Parameter(Mandatory = $false)]  
+        [switch]$Incomplete,
+        [Parameter(Mandatory = $false)]  
         [switch]$Keep       
     )
 
         #           !!!!!!  API TOKEN GOES BELOW HERE   !!!!!!    
-        $RedCapApiToken = ''
+        $RedCapApiToken = 'DE7E5FB09B8140D80512BD24B6FA9205'
         #           !!!!!!  API TOKEN GOES ABOVE HERE   !!!!!! 
         
         <#
@@ -85,6 +87,13 @@ function Search-PacsCorrectionForms {
         #>
     
         if ($null -eq $TcRestError) { 
+	
+            #Filter out complete forms if -Incomplete switch is given
+	    if ($Incomplete) {
+
+                $CorrectionForms = $CorrectionForms | Where-Object {($_.tech_form_complete -ne 'Complete') -or ($_.pacs_response_complete -ne 'Complete')}
+
+            }
 
         if ($null -ne $CorrectionForms) {
             
@@ -101,7 +110,7 @@ function Search-PacsCorrectionForms {
 
                     $MatchedNameForms = foreach ($SingleName in $NameMatch) {
                         
-                        $PopulatedValueForms | Where-Object {($_.source_last_name -match $SingleName) -or ($_.source_first_name -match $SingleName) -or ($_.dest_last_name -match $SingleName) -or ($_.dest_first_name -match $SingleName) -or ($_.pacs_notes -match $SingleName) -or ($_.notes -match $SingleName)}
+                        $PopulatedValueForms | Where-Object {($_.source_last_name -match $SingleName) -or ($_.source_first_name -match $SingleName) -or ($_.dest_last_name -match $SingleName) -or ($_.dest_first_name -match $SingleName)}
     
                     }
                     
@@ -166,7 +175,7 @@ $Header = @"
 </style>
 "@
 
-    $HtmlFormattedCorrections = foreach ($TC in $ReturnedTechCorrections) { 
+    $HtmlFormattedCorrections = foreach ($TC in $ReturnedTechCorrections) {
         $TicketNumber = $TC.subject_id
         $TC | ConvertTo-Html -Head $Header -PreContent "<h3>Ticket #$TicketNumber</h3>" -As List
     }
@@ -200,7 +209,7 @@ $Header = @"
                 Invoke-Item $VariableFileNameDestPath
 
                 if (-not ($Keep)) {
-                    #Looked into tossing this into a runspace to return the prompt immediately however that introduced a momentary delay in launching the .html file
+                
                     Start-Sleep -Seconds 5
                     Remove-Item -Path $VariableFileNameDestPath -Force
             
@@ -214,7 +223,7 @@ $Header = @"
 
     } else {
 
-        #Failed if condition at line 196
+        #Failed if condition at line 205
         Write-Error $HtmlOutFileError.Exception
         break
 
@@ -226,7 +235,7 @@ $Header = @"
 
 } else {
 
-    #Failed if condition at line 144
+    #Failed if condition at line 153
     Write-Warning "No forms matched the provided criteria"
     break
 
@@ -234,15 +243,15 @@ $Header = @"
 
         } else {
             
-            #Failed if condition at line 89
-            Write-Warning "No forms matched the provided date range"
+            #Failed if condition at line 98
+            Write-Warning "No forms matched the provided date range or criteria"
             break
 
         }
 
         } else {
             
-            #Failed if condition at line 87
+            #Failed if condition at line 89
             Write-Error $TcRestError.Exception
             break
 
