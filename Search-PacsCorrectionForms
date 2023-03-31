@@ -17,7 +17,7 @@ function Search-PacsCorrectionForms {
     )
 
         #           !!!!!!  API TOKEN GOES BELOW HERE   !!!!!!    
-        $RedCapApiToken = 'DE7E5FB09B8140D80512BD24B6FA9205'
+        $RedCapApiToken = ''
         #           !!!!!!  API TOKEN GOES ABOVE HERE   !!!!!! 
         
         <#
