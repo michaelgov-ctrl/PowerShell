@@ -136,7 +136,7 @@ function Search-PacsCorrectionForms {
     
                 } 
                 
-                if (($null -ne $MatchedNameForms) -or ($null -ne $MatchedAccForms) -or ($null -ne $MatchedMrnForms)) {
+                if (($null -ne $NameMatch) -or ($null -ne $AccMatch) -or ($null -ne $MrnMatch)) {
 
                     $FilteredForms = New-Object System.Collections.ArrayList
                     $MatchedNameForms | ForEach-Object {$FilteredForms.Add($_) | Out-Null}
