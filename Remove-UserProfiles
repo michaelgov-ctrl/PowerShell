@@ -327,7 +327,8 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
                         $LastWriteTime = ($UserDirectory.LastWriteTime -split " ")[0]
 
                         $DirPath = "C:\Users\" + $UserDirectory.Name
-                        $FileSize = [string][math]::Round((Invoke-Command -Session $Session -ScriptBlock { (Get-ChildItem $using:DirPath -Exclude "OneDrive" -Recurse | Measure-Object -Property length -Sum -ErrorAction SilentlyContinue).Sum/1MB}),2) + " MB"
+                        $FilesToMeasure = Invoke-Command -Session $Session -ScriptBlock { (Get-ChildItem $using:DirPath | Where-Object {$_.name -notmatch "OneDrive"} | Get-ChildItem -Recurse | Measure-Object -Property length -Sum -ErrorAction SilentlyContinue).Sum}
+                        $FileSize = [string][math]::Round(($FilesToMeasure/1MB),2) + " MB"
 
                             "User: $Name, LastWriteTime: $LastWriteTime, ProfileSize: $FileSize"
         
