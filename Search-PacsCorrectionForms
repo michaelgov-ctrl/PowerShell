@@ -68,7 +68,7 @@ function Search-PacsCorrectionForms {
                     returnFormat = 'json'
                 }
         
-                $uri = 'https://redcap.chop.edu/api/'
+                $uri = 'https://[RedCapUrl]/api/'
     
                 $CorrectionForms = Invoke-RestMethod -Uri $uri -Method Post -Body $data
     
