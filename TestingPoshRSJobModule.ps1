@@ -45,7 +45,7 @@
     #Send objects to RunSpaces and work with them via custom function
     $TestObjectArray | Start-RSJob -Name {$_.Name} -FunctionsToImport "Test-Function" -Throttle 3 -ScriptBlock { 
         $MatchingPropertyName = $_.PsObject.Properties.Name -match "AddedProperty"
-        [pscustomobject]@{
+        $RSInteralObject = [pscustomobject]@{
             UniqueProperty = $_.$MatchingPropertyName
             FunctionTest = (Test-Function -OutInt $_.RandomNumber)
         }
