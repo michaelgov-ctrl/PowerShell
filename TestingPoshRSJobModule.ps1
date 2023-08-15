@@ -53,7 +53,6 @@
         Start-Sleep -Seconds (Get-Random -Maximum 60)
     }
 
-
     #Process RunSpace jobs as they complete and set timer
     $Timer = [Diagnostics.Stopwatch]::StartNew()
     $SecondToStopAfter = 20
