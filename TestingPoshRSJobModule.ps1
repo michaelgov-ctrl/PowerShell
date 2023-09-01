@@ -65,7 +65,7 @@
         $CompletedJobs | Where-Object { $_.HasMoreData -eq $true } | Receive-RSJob
 
         Start-Sleep -Seconds 4
-    } until ( (($CompletedJobs.HasMoreData -eq $false).count -eq $CurrentJobs.Count) -or ($Timer.Elapsed.Seconds -gt $SecondToStopAfter) )
+    } until ( (($CompletedJobs.HasMoreData -eq $false).count -eq $CurrentJobs.Count) -or ($Timer.Elapsed.TotalSeconds -gt $SecondToStopAfter) )
     $Timer.Stop()
 
     #Check for still running jobs
