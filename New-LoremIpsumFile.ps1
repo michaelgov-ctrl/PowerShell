@@ -55,5 +55,5 @@ function New-LoremIpsumFile {
         $counter = $counter + $groupBy
     } until ($counter -eq $Words.Count)
 
-    $sentences | Out-File -LiteralPath $OutFilePath
+    $sentences | Out-File -FilePath $OutFilePath
 }
