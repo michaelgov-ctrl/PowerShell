@@ -1,6 +1,5 @@
 
-
-funciton New-LoremIpsumFile {
+function New-LoremIpsumFile {
     [CmdletBinding()]
     Param(
         [Parameter(Mandatory = $true)]
