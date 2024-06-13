@@ -21,7 +21,7 @@ function Get-ADUserGroups {
             $Users = $UserNames
         }
 
-        $Users | % { (Get-ADUser -Filter { Name -eq $_ } -Properties MemberOf) | Select-Object -Property Name,@{name="MemberOf";expression={ ($_.MemberOf | % { $_.split(',')[0].split('=')[1] } | Sort-Object ) -join ';' } } }
+        $Users | % { (Get-ADUser -Filter { SamAccountName -eq $_ } -Properties MemberOf) | Select-Object -Property Name,@{name="MemberOf";expression={ ($_.MemberOf | % { $_.split(',')[0].split('=')[1] } | Sort-Object ) } } }
     
     }
 }
