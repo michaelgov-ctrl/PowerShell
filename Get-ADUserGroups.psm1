@@ -11,6 +11,7 @@ function Get-ADUserGroups {
         ValueFromPipeline = $true)]
         [string[]]$PipelineUserNames            
     )
+    
     process {        
         if ($PipelineUserNames) {
             $Users = $PipelineUserNames
