@@ -1,7 +1,5 @@
 function Get-ADUserGroups {
-
     [CmdletBinding(DefaultParameterSetName = 'UserNames')]
-
     Param(
         [Parameter(Mandatory = $true,
         ParameterSetName = 'UserNames',
@@ -14,7 +12,6 @@ function Get-ADUserGroups {
         [string[]]$PipelineUserNames            
     )
     process {        
-
         if ($PipelineUserNames) {
             $Users = $PipelineUserNames
         } else {
@@ -22,7 +19,6 @@ function Get-ADUserGroups {
         }
 
         $Users | % { (Get-ADUser -Filter { SamAccountName -eq $_ } -Properties MemberOf) | Select-Object -Property Name,@{name="MemberOf";expression={ ($_.MemberOf | % { $_.split(',')[0].split('=')[1] } | Sort-Object ) } } }
-    
     }
 }
 
